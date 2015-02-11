@@ -9,8 +9,7 @@
             <field name="arch" type="xml">
                 <form string="Crear Factura-E">
                     <label string="Este proceso creará la factura electrónica" colspan="4"/>
-                    <!-- <field name="state" invisible="1"/> -->
-                    <field name="state" invisible="0"/>
+                    <field name="state" invisible="1"/>
                     <field name="firmar_facturae" />
                     <group attrs="{'invisible': [('state', '=', 'first')]}" colspan="4">
                         <field name="facturae" filename="facturae_fname"/>

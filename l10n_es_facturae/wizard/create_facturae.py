@@ -238,7 +238,6 @@ class CreateFacturae(orm.TransientModel):
             if company_address_obj.country_id.code_3166:
                 texto += '<CountryCode>' + company_address_obj.country_id.code_3166 + '</CountryCode>'
             else:
-                print 'Dirección: %s ' % company_address_obj.country_id
                 log.add(_('User error:\n\nCompany %s has no country.') % (company_partner_obj.name), True)
                 raise log
             texto += '</AddressInSpain>'
@@ -272,16 +271,29 @@ class CreateFacturae(orm.TransientModel):
 
 
             administrative = False
-            if invoice_partner_address_obj.dir3:
+            if invoice_partner_address_obj.facturae:
                 texto += "<AdministrativeCentres>"
                 administrative = True
 
             def create_administrative_centres(address, code):
                 texto = ""
                 if administrative:
-                     texto += "<AdministrativeCentre>"
-                     texto += "<CentreCode>" + address.dir3 + "</CentreCode>"
-                     texto += "<RoleTypeCode>" + code + "</RoleTypeCode>"
+                    if code == '01':
+                        texto += "<AdministrativeCentre>"
+                        texto += "<CentreCode>" + address.oficina_contable + "</CentreCode>"
+                        texto += "<RoleTypeCode>" + code + "</RoleTypeCode>"
+                    elif code == '02':
+                        texto += "<AdministrativeCentre>"
+                        texto += "<CentreCode>" + address.organo_gestor + "</CentreCode>"
+                        texto += "<RoleTypeCode>" + code + "</RoleTypeCode>"
+                    elif code == '03':
+                        texto += "<AdministrativeCentre>"
+                        texto += "<CentreCode>" + address.unidad_tramitadora + "</CentreCode>"
+                        texto += "<RoleTypeCode>" + code + "</RoleTypeCode>"
+                    else:
+                        texto += "<AdministrativeCentre>"
+                        texto += "<CentreCode>" + '' + "</CentreCode>"
+                        texto += "<RoleTypeCode>" + code + "</RoleTypeCode>"
 
                 texto += '<AddressInSpain>'
                 if address.street:
@@ -311,7 +323,6 @@ class CreateFacturae(orm.TransientModel):
                 if address.country_id.code_3166:
                     texto += '<CountryCode>' + address.country_id.code_3166 + '</CountryCode>'
                 else:
-                    print 'Dirección: %s ' % company_address_obj.country_id
                     log.add(_('User error:\n\nPartner %s has no country.') % (address.name), True)
                     raise log
                 texto += '</AddressInSpain>'
@@ -338,7 +349,7 @@ class CreateFacturae(orm.TransientModel):
                 texto += create_administrative_centres(invoice_partner_address_obj, "01") # Oficina contable
                 texto += create_administrative_centres(contact_partner_address_obj or invoice_partner_address_obj, "02") # Órgano Gestor
                 texto += create_administrative_centres(invoice_partner_address_obj, "03") # Unidad tramitadora
-                texto += create_administrative_centres(contact_partner_address_obj or invoice_partner_address_obj, "04") # Órgano proponente
+                #texto += create_administrative_centres(contact_partner_address_obj or invoice_partner_address_obj, "04") # Órgano proponente
                 texto += "</AdministrativeCentres>"
 
             if tipo_buyer == 'F':
